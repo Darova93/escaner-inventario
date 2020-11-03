@@ -1,34 +1,39 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, FlatList } from 'react-native';
 import AppButton from '../components/AppButton';
-
 import * as FileSystem from 'expo-file-system';
 import * as MailComposer from 'expo-mail-composer';
-
 import CodeStorage from './CodeStorage';
-import PropTypes from 'prop-types';
 
+export default function DataViewer({ navigation }) {
+    const [codeList, setList] = useState([]);
 
-export default class DataViewer extends React.Component {
-    constructor(props) {
-        super(props);
-        this.codeList = CodeStorage.getInstance().getCodeList();
-    }
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            (async () => {
+                promise = CodeStorage.getInstance().getCodeList();
+                promise.then((result) => {
+                    setList(result);
+                });
+            })();
+        });
+        return unsubscribe;
+    }, [navigation]);
 
-    exportCSV = () => {
-        let csvContent = this.codeList.map(e => e.id + "," + e.name + "," + e.type + "," + e.data + "," + e.count + "," + e.date).join("\n");
+    const exportCSV = () => {
+        let csvContent = this.codeList.map(e => e.name + "," + e.type + "," + e.data + "," + e.count + "," + e.date).join("\n");
         FileSystem.writeAsStringAsync(FileSystem.documentDirectory + "productos.csv", csvContent);  
     };
 
-    sendCSV = () => {
-        this.exportCSV();
+    const sendCSV = () => {
+        exportCSV();
         if(!MailComposer.isAvailableAsync()) {
             alert("No está disponible el servicio de correos");
         }
         else {
             MailComposer.composeAsync({
-                recipients:['darova93@gmail.com'],
+                recipients:['solorioe.93@gmail.com'],
                 subject: 'Archivo de códigos',
                 body: '',
                 isHTML: false,
@@ -37,33 +42,34 @@ export default class DataViewer extends React.Component {
         }
     };
 
-    render() {
-        const { isFocused } = this.props;
-
-        return (
-            <View style={styles.container}>
-                <StatusBar style={styles.statusBar} />
-                <FlatList 
-                    style={styles.list}
-                    data={this.codeList}
-                    keyExtractor={item => item.data}
-                    renderItem={({item}) => <Text style={styles.item}>Id: {item.id} Name: {item.name} Code: {item.data} Count: {item.count}</Text>}
-                >  
-                </FlatList>
-                <View style={styles.options}>
-                    <AppButton
-                        text="Enviar"
-                        onPress={this.sendCSV}
-                    />
-                </View>
-            </View>
-        );
+    const clearCodes = () => {
+        CodeStorage.getInstance().removeAllCodes();
     }
-}
 
-AppButton.propTypes = {
-    isFocused: PropTypes.bool,
-}
+    return (
+        <View style={styles.container}>
+            <StatusBar style={styles.statusBar} />
+            <FlatList 
+                style={styles.list}
+                data={codeList}
+                keyExtractor={item => item.data}
+                renderItem={({item}) => <Text style={styles.item}> - Name: {item.name} Code: {item.data} Count: {item.count}</Text>}
+            >  
+            </FlatList>
+            <View style={styles.options}>
+                <AppButton
+                    text="Borrar todo"
+                    onPress={clearCodes}
+                    style={{backgroundColor:"red"}}
+                />
+                <AppButton
+                    text="Enviar"
+                    onPress={sendCSV}
+                />
+            </View>
+        </View>
+    );
+};
 
 const styles = StyleSheet.create({
     container: {

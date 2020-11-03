@@ -9,12 +9,12 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 const Tab = createBottomTabNavigator();
 
-function renderDataViewer() {
-  const isFocused = useIsFocused();
-  return(
-    <DataViewer isFocused={isFocused} />
-  );
-}
+// function renderDataViewer() {
+//   const isFocused = useIsFocused();
+//   return(
+//     <DataViewer isFocused={isFocused} />
+//   );
+// }
 
 export default function App() {
   return (
@@ -38,7 +38,7 @@ export default function App() {
         })}
       >
         <Tab.Screen name="Escaner" component={QRScanner} />
-        <Tab.Screen name="Datos" component={renderDataViewer} />
+        <Tab.Screen name="Datos" component={DataViewer} />
       </Tab.Navigator>
     </NavigationContainer>
   );

@@ -64,10 +64,18 @@ export default function QRScanner() {
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <Text style={styles.modalText}>Se escaneó el código {currentCode.data}</Text>
-            <TextInput value={newCodeName} style={styles.textInput} onChangeText={text => onChangeText(text)}/>
+            {
+              CodeStorage.getInstance().codeExists(currentCode.data) ? 
+              <Text style={styles.modalText}>{CodeStorage.getInstance().getCodeObject(currentCode.data).name}</Text> :
+              <TextInput 
+                value={newCodeName} 
+                style={styles.textInput}
+                onChangeText={text => onChangeText(text)}
+              />
+            }
             <View style={styles.options}>
-              <AppButton text="Cancelar" onPress={cancelCode}/>
-              <AppButton text="Agregar" onPress={addCode}/>
+              <AppButton style={{margin: 8, backgroundColor: 'red'}} text="Cancelar" onPress={cancelCode}/>
+              <AppButton style={{margin: 8}} text="Agregar" onPress={addCode}/>
             </View>
           </View>
         </View>

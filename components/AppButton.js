@@ -10,7 +10,7 @@ export default class AppButton extends React.Component {
     render() {
         return (
             <TouchableOpacity 
-                style={styles.appButtonContainer}
+                style={{...styles.appButtonContainer, ...this.props.style}}
                 onPress={this.props.onPress}
             >
                 <Text style={styles.appButtonText}>{this.props.text}</Text>
@@ -22,6 +22,7 @@ export default class AppButton extends React.Component {
 AppButton.propTypes = {
     text: PropTypes.string.isRequired,
     onPress: PropTypes.func.isRequired,
+    style: PropTypes.object,
 }
 
 const styles = StyleSheet.create({
